@@ -1,0 +1,111 @@
+<!-- templates/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Segmentation App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .supported-types {
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Segmentation App</h1>
+    
+    {% if error %}
+    <div class="error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="upload-container">
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <br>
+            <input type="submit" value="Upload and Segment">
+            
+            <div class="supported-types">
+                Supported file types: PNG, JPG, JPEG, GIF, BMP, TIFF, WebP
+            </div>
+        </form>
+    </div>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Segmentation App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="container mx-auto max-w-md">
+        <h1 class="text-3xl font-bold text-center mb-6">Image Segmentation App</h1>
+        
+        <!-- This is the error message that will be displayed in case of any issues -->
+        {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <form method="POST" enctype="multipart/form-data" class="space-y-4">
+                <div class="flex flex-col items-center">
+                    <!-- This input type is already there for selecting files (for user to manually upload) -->
+                    <input 
+                        type="file" 
+                        name="file" 
+                        accept="image/*" 
+                        required
+                        class="w-full border border-gray-300 rounded-md p-2 mb-4"
+                    >
+                    <button 
+                        type="submit" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        Upload and Segment
+                    </button>
+                </div>
+                
+                <div class="text-sm text-gray-500 text-center mt-2">
+                    Supported file types: PNG, JPG, JPEG, GIF, BMP, TIFF, WebP
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
