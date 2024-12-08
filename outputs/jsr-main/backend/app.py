@@ -1,6 +1,7 @@
 # app.py
 import os
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, jsonify
+from flask_cors import CORS
 import requests
 from PIL import Image, ImageDraw
 import numpy as np
@@ -8,7 +9,7 @@ import uuid
 import imghdr  # For image type validation
 
 app = Flask(__name__)
-
+CORS(app)
 # Ensure upload and output directories exist
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'outputs'
@@ -50,19 +51,22 @@ def validate_image(filepath):
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
-            return render_template('index.html', error='No file part')
+            return jsonify({"error":"no file part found"})
+            # return render_template('index.html', error='No file part')
         
         file = request.files['file']
         
         if file.filename == '':
-            return render_template('index.html', error='No selected file')
+            return jsonify({"error":"no file selected"})
+            # return render_template('index.html', error='No selected file')
         
         # Check file extension
         if not allowed_file(file.filename):
-            return render_template('index.html', error='Invalid file type. Please upload an image.')
+            return jsonify({"error":"invalid file type"})
+            # return render_template('index.html', error='Invalid file type. Please upload an image.')
         
         # Generate unique filename
-        filename = str(uuid.uuid4()) + '_' + file.filename
+        filename = str(uuid.uuid4())+'_'+".jpg"
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
         
@@ -70,7 +74,8 @@ def upload_file():
             # Validate the image
             if not validate_image(filepath):
                 os.remove(filepath)  # Remove invalid file
-                return render_template('index.html', error='Invalid image file')
+                return jsonify({"error":"invalid image file"})
+                # return render_template('index.html', error='Invalid image file')
             
             # Perform segmentation
             original_image, segmented_image, pixel_count = segment_image(filepath)
@@ -83,16 +88,24 @@ def upload_file():
             original_image.convert('RGB').save(original_path, 'JPEG')
             segmented_image.convert('RGB').save(segmented_path, 'JPEG')
             
-            return render_template('result.html', 
-                                   original_image=f'outputs/original_{filename}', 
-                                   segmented_image=f'outputs/segmented_{filename}',
-                                   pixel_count=pixel_count)
+            res_data = {
+                "original_image":"outputs/original_"+filename,
+                "segamented_image":"outputs/segamented_"+filename,
+                "pixel_count":pixel_count
+            }
+            return jsonify(res_data)
+            # return render_template('result.html', 
+            #                        original_image=f'outputs/original_{filename}', 
+            #                        segmented_image=f'outputs/segmented_{filename}',
+            #                        pixel_count=pixel_count)
+            
         
         except Exception as e:
             # Remove temporary file
             if os.path.exists(filepath):
                 os.remove(filepath)
-            return render_template('index.html', error=f'Processing error: {str(e)}')
+            return jsonify({"error":str(e)})
+            # return render_template('index.html', error=f'Processing error: {str(e)}')
     
     return render_template('index.html')
 
